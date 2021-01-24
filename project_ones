@@ -1,0 +1,211 @@
+#Γράψτε ένα κώδικα σε Python ο οποίος να παίρνει την διάσταση ενός τετραγώνου και θα φτιάχνει μέσα από λίστες τον αντίστοιχο πίνακα.
+# Στην συνέχεια θα βρίσκει το πλήθος των θέσεων και θα γεμίζει στην τύχη τις μισές με μονάδες.
+# Σκοπός είναι να μετρήσετε πόσες τετράδες από μονάδες υπάρχουν οριζόντια, κάθετα, και διαγώνια. Το πρόγραμμα επαναλλαμβάνεται 100 φορές (για την ίδια διάσταση) και επιστρέφει τον μέσο όρο των τετράδων.
+
+
+import random
+
+#Functions
+
+def randomGenerator(n):
+    test = n*n
+    randomNums = []
+    for x in range(test//2):
+        value = random.randint(0, test)
+        if len(randomNums)==0:
+            randomNums.append(value)
+
+        else:
+            while (value in randomNums):
+                value = random.randint(0, test)
+            randomNums.append(value)
+    return  randomNums
+
+def createSquare(rows,cols):
+    counterPos = 0
+    randomPositions = randomGenerator(n)
+    arr = []
+    for i in range(cols):
+        col = []
+        for j in range(rows):
+
+            if counterPos in randomPositions:
+                col.append(1)
+            else:
+                col.append(0)
+            counterPos = counterPos + 1
+        arr.append(col)
+    return arr
+
+def printSquare(arr):
+    for row in arr:
+        print(' '.join([str(elem) for elem in row]))
+
+def get_rows(arr):
+    return [[c for c in r] for r in arr]
+
+def get_cols(arr):
+    return zip(*arr)
+
+def get_backward_diagonals(arr):
+    b = [None] * (len(arr) - 1)
+    arr = [b[i:] + r + b[:i] for i, r in enumerate(get_rows(arr))]
+    return [[c for c in r if c is not None] for r in get_cols(arr)]
+
+def get_forward_diagonals(arr):
+    b = [None] * (len(arr) - 1)
+    arr = [b[:i] + r + b[i:] for i, r in enumerate(get_rows(arr))]
+    return [[c for c in r if c is not None] for r in get_cols(arr)]
+
+def column(arr):
+    return [list(r) for r in zip(*arr)]
+
+def onesInRows(arr):
+    counterOnesInRows = 0
+    counterOnes = 0
+    for i in range(len(rows)):
+        counterOnes = 0
+        for j in range(len(rows[i])-1):
+            if len(rows[i])>=4 :
+                if rows[i][j] == rows[i][j+1] == 1:
+                    counterOnes = counterOnes + 1
+                else:
+                    counterOnes = 0
+
+                if counterOnes == 3:
+                    counterOnesInRows = counterOnesInRows + 1
+                    counterOnes = counterOnes-1
+
+
+    return counterOnesInRows
+
+def onesInCols(arr):
+    counterOnesInCols = 0
+    counterOnes = 0
+    for i in range(len(colss)):
+        counterOnes = 0
+        for j in range(len(colss[i])-1):
+            if len(colss[i])>=4:
+                if colss[i][j] == colss[i][j+1] == 1:
+                    counterOnes = counterOnes + 1
+                else:
+                    counterOnes = 0
+                if counterOnes == 3:
+                    counterOnesInCols = counterOnesInCols + 1
+                    counterOnes = counterOnes-1
+
+    return counterOnesInCols
+
+def onesInBackDiagonal(arr):
+    counterOnesInBackDiagonal = 0
+    counterOnes = 0
+    for i in range(len(backDiagonals)):
+        counterOnes = 0
+        for j in range(len(backDiagonals[i])-1):
+            if len(backDiagonals[i])>=4:
+                if backDiagonals[i][j] == backDiagonals[i][j+1] == 1:
+                    counterOnes = counterOnes + 1
+                else:
+                    counterOnes = 0
+                if counterOnes == 3:
+                    counterOnesInBackDiagonal = counterOnesInBackDiagonal + 1
+                    counterOnes = counterOnes-1
+
+    return counterOnesInBackDiagonal
+
+def onesInFrontDiagonal(arr):
+    counterOnesInFrontDiagonal = 0
+    counterOnes = 0
+    for i in range(len(frontDiagonals)):
+        counterOnes = 0
+        for j in range(len(frontDiagonals[i])-1):
+            if len(frontDiagonals[i])>=4:
+                if frontDiagonals[i][j] == frontDiagonals[i][j+1] == 1:
+                    counterOnes = counterOnes + 1
+                else:
+                    counterOnes = 0
+                if counterOnes == 3:
+                    counterOnesInFrontDiagonal = counterOnesInFrontDiagonal + 1
+                    counterOnes = counterOnes-1
+
+    return counterOnesInFrontDiagonal
+
+
+def averageRow(rowsList,columnsList,backDiagonalList,frontDiagonalList):
+    averageR = sum(rowsList)/len(rowsList)
+    print(f"Average One's in Rows: {averageR}")
+    averageC = sum(columnsList) / len(columnsList)
+    print(f"Average One's in Columns: {averageC}")
+    averageB = sum(backDiagonalList) / len(backDiagonalList)
+    print(f"Average One's in Back Diagonals: {averageB}")
+    averageF = sum(frontDiagonalList) / len(frontDiagonalList)
+    print(f"Average One's in Front Diagonals: {averageF}")
+
+
+
+
+
+
+#Main Program
+
+
+n = int(input("Give me the dimention of the square:\n"))
+
+#Variables
+
+rowsList = []
+columnsList = []
+backDiagonalList = []
+frontDiagonalList = []
+print("- - - - - - - - - - - - -")
+
+for turns in range(100):
+
+    arr = createSquare(n, n)
+
+    printSquare(arr)
+    print("\n")
+
+    # All Rows
+    rows = get_rows(arr)
+    # Helper Func
+    cols = get_cols(arr)
+    # All Back Diagonals
+    backDiagonals = get_backward_diagonals(arr)
+    # All Front Diagonals
+    frontDiagonals = get_forward_diagonals(arr)
+    # All Cols
+    colss = column(arr)
+
+    print(f"Four One in Rows: {onesInRows(arr)}")
+    print(f"Four One in Columns: {onesInCols(arr)}")
+    print(f"Four One in Front Diagonals: {onesInBackDiagonal(arr)}")
+    print(f"Four One in Back Diagonals: {onesInFrontDiagonal(arr)}")
+    print("\n- - - - - - - - - - - - -")
+
+    #Ones in 4's
+    rowsList.append(onesInRows(arr))
+    columnsList.append(onesInCols(arr))
+    backDiagonalList.append(onesInBackDiagonal(arr))
+    frontDiagonalList.append(onesInFrontDiagonal(arr))
+
+# Average Calculator and Printer
+averageRow(rowsList,columnsList,backDiagonalList,frontDiagonalList)
+print("\n- - - - - - - - - - - - -")
+print("[0 1 1 1 1 1 0] is counted as two pairs of four Ones!!")
+print("- - - - - - - - - - - - -")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

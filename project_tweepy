@@ -1,0 +1,82 @@
+# Γράψτε ένα κώδικα σε Python ο οποίος συνδέεται στο twitter (χρησιμοποιείστε το tweepy) και επιλέξτε τα 10 τελευταία tweets του χρήστη που θα σας δηλώσει ο χρήστης.
+# Εμφανίστε τις 5 μεγαλύτερες λέξεις και τις 5 μικρότερες λέξεις του.
+
+import tweepy
+
+# Authenticate to Twitter
+auth = tweepy.OAuthHandler("API_KEY", "API_SECRET_KEY")
+auth.set_access_token("ACCESS_TOKEN", "ACCESS_SECRET_TOKEN")
+
+# Create API object
+api = tweepy.API(auth)
+
+try:
+    api.verify_credentials()
+    print("Authentication OK\n")
+except:
+    print("Error during authentication")
+
+try:
+
+    userToBeSearched = input("Insert the name of the user: ")
+
+    # Screen name of the account to be fetched
+    screen_name = userToBeSearched
+
+    # Number of statuses to be fetched
+    count = 10
+
+    # Fetching the statuses
+    statuses = api.user_timeline(screen_name, count=count)
+
+    status_counter = 1
+    # Printing the statuses
+    for status in statuses:
+        alphaListWords = []
+        smallestWords = []
+        biggestWords = []
+
+        print(f"Status Number {status_counter}: \n{status.text}")
+        status_counter = status_counter + 1
+
+        # Using split()
+        # to extract words from string
+        listWords = status.text.split()
+
+        # print("The list of words is : " + str(listWords))
+
+        max_len = -1
+        for wordB in listWords:
+            if wordB.isalpha():
+                alphaListWords.append(wordB)
+
+        sortedAlphaListWords = sorted(alphaListWords, key=len)
+
+        for word in sortedAlphaListWords:
+            if len(word) < 2:
+                sortedAlphaListWords.remove(word)
+
+        # Printing all the words from the post
+        # print(sortedAlphaListWords)
+
+        for i in sortedAlphaListWords:
+            if sortedAlphaListWords.index(i) < 5:
+                smallestWords.append(i)
+
+        print(f"\nThe 10 smallest words: {smallestWords}")
+
+        for i in sortedAlphaListWords[::-1]:
+            if sortedAlphaListWords.index(i) > len(sortedAlphaListWords) - 6:
+                biggestWords.append(i)
+
+        print(f"The 10 biggest words: {biggestWords}")
+        print("\n")
+
+except:
+    print("Something went wrong :(")
+
+
+
+
+
+

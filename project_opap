@@ -1,0 +1,82 @@
+# Χρησιμοποιήστε το API του ΟΠΑΠ (https://www.opap.gr/web-services) από την Python
+# για να εμφανίσετε τα στατιστικά των αριθμών που κερδίζουν την πρώτη κλήρωση της ημέρας για το ΚΙΝΟ τον τρέχον μήνα.
+
+import requests
+import json
+from datetime import datetime
+from datetime import timedelta
+
+def jprint(obj):
+    # create a formatted string of the Python JSON object
+    text = json.dumps(obj, sort_keys=True, indent=4)
+    print(text)
+
+#Date Now and Convertion to Str
+today = str(datetime.now().date())
+helperVarToday = datetime.now().date()
+yesterday = helperVarToday - timedelta(days = 1)
+
+#Params and Variables
+counter = 0
+numbersStatList = []
+gameId = 1100
+fromDate = today
+toDate = today
+
+#Try if the first game was played and Except if it was not (at 12 a.m. Kino stops so we choose yesterday as date!)
+
+try:
+
+  responseDrawId = requests.get(f"https://api.opap.gr/draws/v3.0/{gameId}/draw-date/{fromDate}/{toDate}/draw-id")
+  first_drawId = responseDrawId.json()[0]
+  print("-----------")
+  print(f"Date: {today}")
+
+except:
+  print("\nYesterday's Draw because is past 12am!!")
+  fromDate = yesterday
+  toDate = yesterday
+  responseDrawId = requests.get(f"https://api.opap.gr/draws/v3.0/{gameId}/draw-date/{fromDate}/{toDate}/draw-id")
+  first_drawId = responseDrawId.json()[0]
+  print("-----------")
+  print(f"Date: {yesterday}")
+
+print("-----------")
+print(f"First Draw (ID) of the day: {first_drawId}" )
+print("\n")
+
+responseElementsOfDrawId = requests.get(f"https://api.opap.gr/draws/v3.0/{gameId}/{first_drawId}")
+winningNumbers = responseElementsOfDrawId.json()["winningNumbers"]["list"]
+winningBonusNumber = responseElementsOfDrawId.json()["winningNumbers"]["bonus"]
+print("-----------")
+print(f"Bonus Number: {winningBonusNumber}")
+print("-----------")
+print(f"Winning Numbers: {winningNumbers}")
+print("-----------")
+print("\n")
+
+
+responseStatistics = requests.get(f"https://api.opap.gr/games/v1.0/1100/statistics?drawRange=1801")
+bonusNumStats = responseStatistics.json()["bonusNumbers"]
+
+for num in responseStatistics.json()["numbers"]:
+    numbersStatList.append(num)
+
+print("----- Bonus Number -----")
+print(f"Number: {winningBonusNumber[0]}")
+bonusOccurrences = bonusNumStats[winningBonusNumber[0]-1]["occurrences"]
+bonusDelays = bonusNumStats[winningBonusNumber[0]-1]["delays"]
+print(f"Occurrences: {bonusOccurrences}")
+print(f"Delays: {bonusDelays}")
+print("----- Winning Numbers -----")
+
+
+for elem in winningNumbers:
+    print(f"Number: {elem}")
+    occurrences = numbersStatList[elem-1]["occurrences"]
+    delays = numbersStatList[elem-1]["delays"]
+    print(f"Occurrences: {occurrences}")
+    print(f"Delays: {delays}")
+    print("-----------")
+
+
